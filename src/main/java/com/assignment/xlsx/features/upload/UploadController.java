@@ -18,7 +18,7 @@ public class UploadController {
 
     private final UploadService uploadService;
 
-    @PostMapping(consumes = "application/vnd.ms-excel")
+    @PostMapping
     public ResponseEntity<String> upload(@RequestPart MultipartFile file,
                                          @Valid @ValidExcelRange @RequestParam String range,
                                          @RequestParam String worksheet) {
