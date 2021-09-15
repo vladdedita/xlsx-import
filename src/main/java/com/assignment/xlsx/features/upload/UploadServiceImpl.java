@@ -4,7 +4,6 @@ package com.assignment.xlsx.features.upload;
 import com.assignment.xlsx.features.metadata.FileMetadataService;
 import com.assignment.xlsx.features.opportunity.OpportunityService;
 import com.assignment.xlsx.features.upload.utils.BoundedExcelRange;
-import com.assignment.xlsx.features.upload.utils.ExcelRange;
 import com.monitorjbl.xlsx.StreamingReader;
 import com.monitorjbl.xlsx.exceptions.MissingSheetException;
 import io.vavr.control.Try;
@@ -12,12 +11,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellAddress;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -25,7 +26,6 @@ import java.util.stream.StreamSupport;
 @RequiredArgsConstructor
 @Slf4j
 public class UploadServiceImpl implements UploadService {
-
 
     private final OpportunityService opportunityService;
     private final FileMetadataService fileMetadataService;
@@ -59,7 +59,7 @@ public class UploadServiceImpl implements UploadService {
      * @param file
      * @param range
      * @param worksheetName
-     * @return
+     * @return number of successfuly imported rows
      */
     long importExcelData(MultipartFile file, String range, String worksheetName) {
         try (Workbook workbook = StreamingReader.builder()
@@ -68,7 +68,7 @@ public class UploadServiceImpl implements UploadService {
                 .open(file.getInputStream())) {
 
             Sheet sheet = workbook.getSheet(worksheetName);
-            BoundedExcelRange excelRange = new BoundedExcelRange(range, new CellAddress("B3"), new CellAddress("K3"));
+            BoundedExcelRange excelRange = new BoundedExcelRange(range);
 
             //Only counting failed rows
             //because the number might be smaller than succeeded rows
@@ -77,12 +77,10 @@ public class UploadServiceImpl implements UploadService {
             StreamSupport
                     .stream(Spliterators.spliteratorUnknownSize(sheet.rowIterator(), Spliterator.ORDERED), false)
                     //Only parse selected rows
-                    .filter(row -> row.getRowNum() >= excelRange.getStart().getRow())
-                    .filter(row -> row.getRowNum() <= excelRange.getEnd().getRow())
+                    .filter(excelRange.isRowInRange())
                     //map row to dto
                     .map(row -> Try.ofSupplier(() -> TransactionDTO.of(excelRange, row))
-                            .onFailure((e) -> failedRows.put(row.getRowNum(), e.getMessage()))
-                    )
+                            .onFailure((e) -> failedRows.put(row.getRowNum(), e.getMessage())))
                     //only process successfully parsed rows
                     .filter(Try::isSuccess)
                     .map(Try::get)
