@@ -1,23 +1,31 @@
 package com.assignment.xlsx.features.upload;
 
-import com.assignment.xlsx.features.upload.model.enums.BookingTypeEnum;
-import com.assignment.xlsx.features.upload.model.enums.ProductEnum;
-import com.assignment.xlsx.features.upload.model.enums.TeamEnum;
-import lombok.ToString;
-import lombok.Value;
+import com.assignment.xlsx.config.StringBooleanSerializer;
+import com.assignment.xlsx.config.StringCurrencySerializer;
+import com.assignment.xlsx.features.opportunity.enums.BookingTypeEnum;
+import com.assignment.xlsx.features.opportunity.enums.ProductEnum;
+import com.assignment.xlsx.features.opportunity.enums.TeamEnum;
+import com.assignment.xlsx.features.upload.utils.BoundedExcelRange;
+import com.assignment.xlsx.features.upload.utils.ExcelRange;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 import java.util.Date;
 import java.util.UUID;
 
-@Value
+@Getter
+@Setter
+@AllArgsConstructor
 @ToString
-public class RecordDTO {
+public class TransactionDTO {
 
-    private RecordDTO(UploadServiceImpl.ExcelRange range, Row row) {
-        int start = range.start.getColumn();
-        int end = range.end.getColumn();
+    public TransactionDTO() {
+    }
+
+    private TransactionDTO(BoundedExcelRange range, Row row) {
+        int start = range.getStart().getColumn();
 
         this.customerName = getCell(row, start).getStringCellValue();
         this.bookingDate = new Date(getCell(row, start + 1).getDateCellValue().getTime());
@@ -42,12 +50,8 @@ public class RecordDTO {
         return cell;
     }
 
-    public static RecordDTO of(UploadServiceImpl.ExcelRange range, Row row) {
-        int start = range.start.getColumn();
-        int end = range.end.getColumn();
-        if (end - start < 10)
-            throw new IllegalArgumentException(String.format("Selected range %s does not cover all data columns", range.toString()));
-        return new RecordDTO(range, row);
+    public static TransactionDTO of(BoundedExcelRange range, Row row) {
+        return new TransactionDTO(range, row);
     }
 
     String customerName;
@@ -58,6 +62,8 @@ public class RecordDTO {
     String salesOrganization;
     TeamEnum team;
     ProductEnum product;
+    @JsonSerialize(using= StringCurrencySerializer.class)
     double total;
+    @JsonSerialize(using= StringBooleanSerializer.class)
     boolean renewable;
 }

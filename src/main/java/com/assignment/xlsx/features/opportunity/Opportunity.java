@@ -1,9 +1,9 @@
-package com.assignment.xlsx.features.upload;
+package com.assignment.xlsx.features.opportunity;
 
 
-import com.assignment.xlsx.features.upload.model.enums.BookingTypeEnum;
-import com.assignment.xlsx.features.upload.model.enums.ProductEnum;
-import com.assignment.xlsx.features.upload.model.enums.TeamEnum;
+import com.assignment.xlsx.features.opportunity.enums.BookingTypeEnum;
+import com.assignment.xlsx.features.opportunity.enums.ProductEnum;
+import com.assignment.xlsx.features.opportunity.enums.TeamEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Booking {
+public class Opportunity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

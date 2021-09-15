@@ -1,4 +1,4 @@
-create table if not exists booking (
+create table if not exists opportunity (
     id serial NOT NULL,
     opportunity_id uuid not null,
     customer_name varchar,

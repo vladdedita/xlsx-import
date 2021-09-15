@@ -1,4 +1,4 @@
-package com.assignment.xlsx.features.upload.model.enums;
+package com.assignment.xlsx.features.opportunity.enums;
 
 public enum BookingTypeEnum {
     NEW("NEW"),
