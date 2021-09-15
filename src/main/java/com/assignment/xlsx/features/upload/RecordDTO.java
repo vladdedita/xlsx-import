@@ -43,8 +43,10 @@ public class RecordDTO {
     }
 
     public static RecordDTO of(UploadServiceImpl.ExcelRange range, Row row) {
-        if (range.end.getColumn() - range.start.getColumn() < 10)
-            throw new IllegalArgumentException("Selected range does not cover all data columns");
+        int start = range.start.getColumn();
+        int end = range.end.getColumn();
+        if (end - start < 10)
+            throw new IllegalArgumentException(String.format("Selected range %s does not cover all data columns", range.toString()));
         return new RecordDTO(range, row);
     }
 

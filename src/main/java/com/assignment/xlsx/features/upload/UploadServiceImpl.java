@@ -5,6 +5,7 @@ import com.monitorjbl.xlsx.StreamingReader;
 import com.monitorjbl.xlsx.exceptions.MissingSheetException;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -20,9 +21,10 @@ import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UploadServiceImpl implements UploadService {
 
-    public final class ExcelRange {
+    public static final class ExcelRange {
         CellAddress start;
         CellAddress end;
 
@@ -31,6 +33,11 @@ public class UploadServiceImpl implements UploadService {
             start = new CellAddress(splitRange[0]);
             end = new CellAddress(splitRange[1]);
             //TODO should validate start & finish
+        }
+
+        @Override
+        public String toString() {
+            return "[" + start.formatAsString() + ":" + end.formatAsString() + "]";
         }
     }
 
@@ -47,7 +54,6 @@ public class UploadServiceImpl implements UploadService {
     @Override
     public void upload(MultipartFile file, String range, String worksheetName) {
 
-
         try (Workbook workbook = StreamingReader.builder()
                 .rowCacheSize(100)
                 .bufferSize(4096)
@@ -61,7 +67,10 @@ public class UploadServiceImpl implements UploadService {
                     //Only parse selected rows
                     .filter(row -> row.getRowNum() >= excelRange.start.getRow())
                     .filter(row -> row.getRowNum() <= excelRange.end.getRow())
-                    .map(row -> Try.ofSupplier(() -> RecordDTO.of(excelRange, row)))
+
+
+                    .map(row -> Try.ofSupplier(() -> RecordDTO.of(excelRange, row))
+                            .onFailure((e) -> log.warn(e.getMessage())))
                     //Only process entries that have been parsed successfully
                     .filter(Try::isSuccess)
                     .map(Try::get)
