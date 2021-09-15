@@ -1,6 +1,7 @@
 package com.assignment.xlsx.features.upload;
 
 
+import com.assignment.xlsx.features.metadata.FileMetadataService;
 import com.assignment.xlsx.features.opportunity.OpportunityService;
 import com.assignment.xlsx.features.upload.utils.BoundedExcelRange;
 import com.assignment.xlsx.features.upload.utils.ExcelRange;
@@ -26,6 +27,7 @@ public class UploadServiceImpl implements UploadService {
 
 
     private final OpportunityService opportunityService;
+    private final FileMetadataService fileMetadataService;
 
     /**
      * Method that extracts data within the specified range
@@ -62,11 +64,16 @@ public class UploadServiceImpl implements UploadService {
                     .forEach(opportunity -> Try.run(() -> opportunityService.save(opportunity))
                             .onFailure(e -> log.warn(e.getMessage())));
 
+
         } catch (IOException ioException) {
             throw new IllegalArgumentException("Could not open excel.");
         } catch (MissingSheetException missingSheetException) {
             throw new IllegalArgumentException(String.format("%s is not a valid sheet name", worksheetName));
         }
+
+
+        fileMetadataService.save(file.getOriginalFilename(), file.getSize(), range);
+
 
     }
 
