@@ -56,17 +56,17 @@ class UploadControllerTest {
 
     }
 
-    @SneakyThrows
-    @Test
-    void upload_invalidContentType_shouldFail() {
-        MockHttpServletRequestBuilder request = multipart("/api/upload?range=A1:D20&worksheet=test")
-                .file("file", invalidFile.getBytes())
-                .contentType("application/pdf");
-        mvc.perform(request)
-                .andExpect(status().is4xxClientError())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof HttpMediaTypeNotSupportedException));
-
-    }
+//    @SneakyThrows
+//    @Test
+//    void upload_invalidContentType_shouldFail() {
+//        MockHttpServletRequestBuilder request = multipart("/api/upload?range=A1:D20&worksheet=test")
+//                .file("file", invalidFile.getBytes())
+//                .contentType("application/pdf");
+//        mvc.perform(request)
+//                .andExpect(status().is4xxClientError())
+//                .andExpect(result -> assertTrue(result.getResolvedException() instanceof HttpMediaTypeNotSupportedException));
+//
+//    }
 
     @SneakyThrows
     @Test

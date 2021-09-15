@@ -24,6 +24,9 @@ import java.util.stream.StreamSupport;
 @Slf4j
 public class UploadServiceImpl implements UploadService {
 
+
+    private final BookingRepository bookingRepository;
+
     public static final class ExcelRange {
         CellAddress start;
         CellAddress end;
@@ -67,15 +70,25 @@ public class UploadServiceImpl implements UploadService {
                     //Only parse selected rows
                     .filter(row -> row.getRowNum() >= excelRange.start.getRow())
                     .filter(row -> row.getRowNum() <= excelRange.end.getRow())
-
-
                     .map(row -> Try.ofSupplier(() -> RecordDTO.of(excelRange, row))
                             .onFailure((e) -> log.warn(e.getMessage())))
                     //Only process entries that have been parsed successfully
                     .filter(Try::isSuccess)
                     .map(Try::get)
                     //Save to db
-                    .forEach(System.out::println);
+                    .map(record -> Booking.builder()
+                            .accountExecutive(record.getAccountExecutive())
+                            .bookingDate(record.getBookingDate())
+                            .opportunityId(record.getOpportunityId())
+                            .bookingType(record.getBookingType())
+                            .customerName(record.getCustomerName())
+                            .product(record.getProduct())
+                            .renewable(record.isRenewable())
+                            .salesOrganization(record.getSalesOrganization())
+                            .team(record.getTeam())
+                            .total(record.getTotal())
+                            .build())
+                    .forEach(booking -> Try.of(() -> bookingRepository.save(booking)).onFailure(e -> log.error(e.getMessage())));
 
         } catch (IOException ioException) {
             throw new IllegalArgumentException("Could not open excel.");
