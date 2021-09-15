@@ -14,7 +14,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Spliterator;
@@ -45,7 +47,14 @@ public class UploadServiceImpl implements UploadService {
     public long upload(MultipartFile file, String range, String worksheetName) {
 
         //import excel data
-        long insertedCount = importExcelData(file, range, worksheetName);
+        long insertedCount = 0;
+
+        try {
+            insertedCount = importExcelData(file.getInputStream(), range, worksheetName);
+        } catch (IOException ioException) {
+            log.error("Could not open uploaded file", ioException);
+            throw new IllegalArgumentException("Could not open uploaded file.");
+        }
         //save file metadata
         fileMetadataService.save(file.getOriginalFilename(), file.getSize(), range, insertedCount);
 
@@ -56,16 +65,19 @@ public class UploadServiceImpl implements UploadService {
      * Method that streams over excel entries
      * in the specified range
      *
-     * @param file
+     * @param fis
      * @param range
      * @param worksheetName
      * @return number of successfuly imported rows
      */
-    long importExcelData(MultipartFile file, String range, String worksheetName) {
+    long importExcelData(InputStream fis, String range, String worksheetName) {
+        //In order to improve memory consumption
+        //we're going to stream over 100 rows at a time
+        //instead of loading the whole file in memory at once
         try (Workbook workbook = StreamingReader.builder()
                 .rowCacheSize(100)
                 .bufferSize(4096)
-                .open(file.getInputStream())) {
+                .open(fis)) {
 
             Sheet sheet = workbook.getSheet(worksheetName);
             BoundedExcelRange excelRange = new BoundedExcelRange(range);
@@ -92,9 +104,7 @@ public class UploadServiceImpl implements UploadService {
             long totalRows = excelRange.getEnd().getRow() - excelRange.getStart().getRow();
 
             return totalRows - failedRows.size() + 1;            //+ 1 because it's zero based
-        } catch (IOException ioException) {
-            throw new IllegalArgumentException("Could not open excel.");
-        } catch (MissingSheetException missingSheetException) {
+        } catch (MissingSheetException | IOException missingSheetException) {
             throw new IllegalArgumentException(String.format("%s is not a valid sheet name", worksheetName));
         }
     }

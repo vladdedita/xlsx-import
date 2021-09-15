@@ -18,6 +18,9 @@ public class UploadController {
 
     private final UploadService uploadService;
 
+
+    //Commented to work with POSTMAN
+    //    @PostMapping(consumes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     @PostMapping
     public ResponseEntity<String> upload(@RequestPart MultipartFile file,
                                          @Valid @ValidExcelRange @RequestParam String range,

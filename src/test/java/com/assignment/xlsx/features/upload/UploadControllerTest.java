@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,7 +40,7 @@ class UploadControllerTest {
 
     @BeforeEach
     public void init() {
-        doNothing().when(uploadService).upload(isA(MultipartFile.class), isA(String.class), isA(String.class));
+        doReturn(1L).when(uploadService).upload(isA(MultipartFile.class), isA(String.class), isA(String.class));
     }
 
     @SneakyThrows
@@ -51,8 +52,7 @@ class UploadControllerTest {
                 .contentType(APPLICATION_VND_MS_EXCEL);
 
         mvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(result -> assertEquals(result.getResponse().getContentAsString(), "Upload success"));
+                .andExpect(status().isOk());
 
     }
 
