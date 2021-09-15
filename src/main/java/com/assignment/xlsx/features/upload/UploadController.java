@@ -22,7 +22,7 @@ public class UploadController {
     public ResponseEntity<String> upload(@RequestPart MultipartFile file,
                                          @Valid @ValidExcelRange @RequestParam String range,
                                          @RequestParam String worksheet) {
-        uploadService.upload(file, range, worksheet);
-        return ResponseEntity.ok("Upload success");
+        long insertCount = uploadService.upload(file, range, worksheet);
+        return ResponseEntity.ok(String.format("Successfully uploaded excel and imported %d entries", insertCount));
     }
 }

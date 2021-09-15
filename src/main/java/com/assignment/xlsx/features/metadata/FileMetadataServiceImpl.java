@@ -10,11 +10,12 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 
     @Override
-    public void save(String name, long size, String range) {
+    public void save(String name, long size, String range, long insertedCount) {
         fileMetadataRepository.save(FileMetadata.builder()
                 .name(name)
                 .size(size)
                 .range(range)
+                .insertedCount(insertedCount)
                 .build());
     }
 }

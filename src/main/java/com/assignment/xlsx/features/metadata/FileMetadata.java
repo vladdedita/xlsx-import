@@ -34,6 +34,7 @@ public class FileMetadata {
     @CreationTimestamp
     Date uploadDate;
 
+    Long insertedCount;
     Long size;
     String range;
 }

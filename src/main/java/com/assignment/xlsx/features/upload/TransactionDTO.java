@@ -7,12 +7,14 @@ import com.assignment.xlsx.features.opportunity.enums.ProductEnum;
 import com.assignment.xlsx.features.opportunity.enums.TeamEnum;
 import com.assignment.xlsx.features.upload.utils.BoundedExcelRange;
 import com.assignment.xlsx.features.upload.utils.ExcelRange;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter
@@ -27,32 +29,49 @@ public class TransactionDTO {
     private TransactionDTO(BoundedExcelRange range, Row row) {
         int start = range.getStart().getColumn();
 
-        this.customerName = getCell(row, start).getStringCellValue();
-        this.bookingDate = new Date(getCell(row, start + 1).getDateCellValue().getTime());
-        this.opportunityId = UUID.fromString(getCell(row, start + 2).getStringCellValue());
-        String bookingType = getCell(row, start + 3).getStringCellValue();
-        this.bookingType = BookingTypeEnum.valueOf(bookingType.toUpperCase());
-        this.total = getCell(row, start + 4).getNumericCellValue();
-        this.accountExecutive = getCell(row, start + 5).getStringCellValue();
-        this.salesOrganization = getCell(row, start + 6).getStringCellValue();
-        String teamName = getCell(row, start + 7).getStringCellValue();
-        this.team = TeamEnum.valueOf(teamName);
-        String productName = getCell(row, start + 8).getStringCellValue();
-        this.product = ProductEnum.valueOf(productName);
-        this.renewable = "YES".equals(getCell(row, start + 9).getStringCellValue());
+        this.rowNum = row.getRowNum();
+        this.customerName = getCell(row, start).map(Cell::getStringCellValue).orElse(null);
+        this.bookingDate = getCell(row, start + 1)
+                .map(Cell::getDateCellValue)
+                .orElse(null);
+        this.opportunityId = getCell(row, start + 2)
+                .map(Cell::getStringCellValue)
+                .map(UUID::fromString)
+                .orElse(null);
+
+        this.bookingType = getCell(row, start + 3)
+                .map(Cell::getStringCellValue)
+                .map(String::toUpperCase)
+                .map(BookingTypeEnum::valueOf)
+                .orElse(null);
+
+        this.total = getCell(row, start + 4)
+                .map(Cell::getNumericCellValue)
+                .orElse(null);
+        this.accountExecutive = getCell(row, start + 5)
+                .map(Cell::getStringCellValue)
+                .orElse(null);
+        this.salesOrganization = getCell(row, start + 6).map(Cell::getStringCellValue).orElse(null);
+        this.team = getCell(row, start + 7).map(Cell::getStringCellValue).map(TeamEnum::valueOf).orElse(null);
+
+        this.product = getCell(row, start + 8).map(Cell::getStringCellValue).map(ProductEnum::valueOf).orElse(null);
+        this.renewable = "YES".equals(getCell(row, start + 9).map(Cell::getStringCellValue).orElse(null));
     }
 
 
-    private Cell getCell(Row row, int i) {
-        Cell cell = row.getCell(i);
-        if (cell == null)
-            throw new IllegalArgumentException(String.format("No value present on position %d on row %d", i, row.getRowNum()));
-        return cell;
+    private Optional<Cell> getCell(Row row, int i) {
+        Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+//        if (cell == null)
+//            throw new IllegalArgumentException(String.format("No value present on position %d on row %d", i, row.getRowNum()));
+        return Optional.ofNullable(cell);
     }
 
     public static TransactionDTO of(BoundedExcelRange range, Row row) {
         return new TransactionDTO(range, row);
     }
+
+    @JsonIgnore
+    Integer rowNum;
 
     String customerName;
     Date bookingDate;
@@ -62,8 +81,8 @@ public class TransactionDTO {
     String salesOrganization;
     TeamEnum team;
     ProductEnum product;
-    @JsonSerialize(using= StringCurrencySerializer.class)
-    double total;
-    @JsonSerialize(using= StringBooleanSerializer.class)
+    @JsonSerialize(using = StringCurrencySerializer.class)
+    Double total;
+    @JsonSerialize(using = StringBooleanSerializer.class)
     boolean renewable;
 }
