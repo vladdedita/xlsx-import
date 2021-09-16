@@ -23,6 +23,22 @@ import java.util.UUID;
 @ToString
 public class TransactionDTO {
 
+    @JsonIgnore
+    Integer rowNum;
+
+    String customerName;
+    Date bookingDate;
+    UUID opportunityId;
+    BookingTypeEnum bookingType;
+    String accountExecutive;
+    String salesOrganization;
+    TeamEnum team;
+    ProductEnum product;
+    @JsonSerialize(using = StringCurrencySerializer.class)
+    Double total;
+    @JsonSerialize(using = StringBooleanSerializer.class)
+    boolean renewable;
+
     public TransactionDTO() {
     }
 
@@ -61,8 +77,6 @@ public class TransactionDTO {
 
     private Optional<Cell> getCell(Row row, int i) {
         Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-//        if (cell == null)
-//            throw new IllegalArgumentException(String.format("No value present on position %d on row %d", i, row.getRowNum()));
         return Optional.ofNullable(cell);
     }
 
@@ -70,19 +84,5 @@ public class TransactionDTO {
         return new TransactionDTO(range, row);
     }
 
-    @JsonIgnore
-    Integer rowNum;
 
-    String customerName;
-    Date bookingDate;
-    UUID opportunityId;
-    BookingTypeEnum bookingType;
-    String accountExecutive;
-    String salesOrganization;
-    TeamEnum team;
-    ProductEnum product;
-    @JsonSerialize(using = StringCurrencySerializer.class)
-    Double total;
-    @JsonSerialize(using = StringBooleanSerializer.class)
-    boolean renewable;
 }
