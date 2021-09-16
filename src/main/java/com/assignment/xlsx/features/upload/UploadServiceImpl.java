@@ -14,7 +14,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -104,8 +103,10 @@ public class UploadServiceImpl implements UploadService {
             long totalRows = excelRange.getEnd().getRow() - excelRange.getStart().getRow();
 
             return totalRows - failedRows.size() + 1;            //+ 1 because it's zero based
-        } catch (MissingSheetException | IOException missingSheetException) {
+        } catch (MissingSheetException missingSheetException) {
             throw new IllegalArgumentException(String.format("%s is not a valid sheet name", worksheetName));
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Uploaded file could not be opened as excel.");
         }
     }
 
