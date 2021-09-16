@@ -3,7 +3,10 @@ package com.assignment.xlsx.features.opportunity.dto;
 import com.assignment.xlsx.features.opportunity.enums.BookingTypeEnum;
 import com.assignment.xlsx.features.opportunity.enums.ProductEnum;
 import com.assignment.xlsx.features.opportunity.enums.TeamEnum;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -12,7 +15,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OpportunityFilterDTO {
+public class OpportunitySearchCriteria {
     TeamEnum team;
     ProductEnum product;
     BookingTypeEnum bookingType;

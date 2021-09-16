@@ -14,5 +14,5 @@ public interface UploadService {
      * @param range         - Ex. A1:D20
      * @param worksheetName - name of the worksheet
      */
-    long upload(MultipartFile file, String range, String worksheetName);
+    int upload(MultipartFile file, String range, String worksheetName);
 }

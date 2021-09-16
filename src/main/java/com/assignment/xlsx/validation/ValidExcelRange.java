@@ -10,6 +10,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidExcelRange {
     String message() default "Please provide a valid excel range (Ex. A1:D20)";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

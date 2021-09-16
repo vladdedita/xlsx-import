@@ -20,23 +20,22 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Opportunity {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "opportunity_id", unique = true)
-    UUID opportunityId;
-
-    String customerName;
-    Date bookingDate;
+    private UUID opportunityId;
     @Enumerated(EnumType.STRING)
-    BookingTypeEnum bookingType;
-    String accountExecutive;
-    String salesOrganization;
+    private BookingTypeEnum bookingType;
+    private String customerName;
+    private Date bookingDate;
+    private String accountExecutive;
+    private String salesOrganization;
     @Enumerated(EnumType.STRING)
-    TeamEnum team;
+    private TeamEnum team;
     @Enumerated(EnumType.STRING)
-    ProductEnum product;
-
-    Double total;
-    Boolean renewable;
+    private ProductEnum product;
+    private Double total;
+    private Boolean renewable;
 }

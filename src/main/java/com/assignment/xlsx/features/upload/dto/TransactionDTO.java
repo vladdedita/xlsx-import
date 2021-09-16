@@ -1,4 +1,4 @@
-package com.assignment.xlsx.features.upload;
+package com.assignment.xlsx.features.upload.dto;
 
 import com.assignment.xlsx.config.StringBooleanSerializer;
 import com.assignment.xlsx.config.StringCurrencySerializer;
@@ -6,10 +6,12 @@ import com.assignment.xlsx.features.opportunity.enums.BookingTypeEnum;
 import com.assignment.xlsx.features.opportunity.enums.ProductEnum;
 import com.assignment.xlsx.features.opportunity.enums.TeamEnum;
 import com.assignment.xlsx.features.upload.utils.BoundedExcelRange;
-import com.assignment.xlsx.features.upload.utils.ExcelRange;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -25,7 +27,6 @@ public class TransactionDTO {
 
     @JsonIgnore
     Integer rowNum;
-
     String customerName;
     Date bookingDate;
     UUID opportunityId;
@@ -74,14 +75,13 @@ public class TransactionDTO {
         this.renewable = "YES".equals(getCell(row, start + 9).map(Cell::getStringCellValue).orElse(null));
     }
 
+    public static TransactionDTO of(BoundedExcelRange range, Row row) {
+        return new TransactionDTO(range, row);
+    }
 
     private Optional<Cell> getCell(Row row, int i) {
         Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
         return Optional.ofNullable(cell);
-    }
-
-    public static TransactionDTO of(BoundedExcelRange range, Row row) {
-        return new TransactionDTO(range, row);
     }
 
 

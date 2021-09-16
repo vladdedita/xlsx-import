@@ -3,6 +3,7 @@ package com.assignment.xlsx.features.upload;
 
 import com.assignment.xlsx.features.metadata.FileMetadataService;
 import com.assignment.xlsx.features.opportunity.OpportunityService;
+import com.assignment.xlsx.features.upload.dto.TransactionDTO;
 import com.assignment.xlsx.features.upload.utils.BoundedExcelRange;
 import com.monitorjbl.xlsx.StreamingReader;
 import com.monitorjbl.xlsx.exceptions.MissingSheetException;
@@ -43,12 +44,12 @@ public class UploadServiceImpl implements UploadService {
      * @return successfully inserted excel lines count
      */
     @Override
-    public long upload(MultipartFile file, String range, String worksheetName) {
+    public int upload(MultipartFile file, String range, String worksheetName) {
 
-        //import excel data
-        long insertedCount = 0;
+        int insertedCount;
 
         try {
+            //import excel data
             insertedCount = importExcelData(file.getInputStream(), range, worksheetName);
         } catch (IOException ioException) {
             log.error("Could not open uploaded file", ioException);
@@ -64,12 +65,12 @@ public class UploadServiceImpl implements UploadService {
      * Method that streams over excel entries
      * in the specified range
      *
-     * @param fis
-     * @param range
-     * @param worksheetName
-     * @return number of successfuly imported rows
+     * @param fis           - inputstream of the excel file
+     * @param range         - Excel range rectangle to import
+     * @param worksheetName excel worksheet name to import
+     * @return number of successfully imported rows
      */
-    long importExcelData(InputStream fis, String range, String worksheetName) {
+    int importExcelData(InputStream fis, String range, String worksheetName) {
         //In order to improve memory consumption
         //we're going to stream over 100 rows at a time
         //instead of loading the whole file in memory at once
@@ -91,16 +92,16 @@ public class UploadServiceImpl implements UploadService {
                     .filter(excelRange.isRowInRange())
                     //map row to dto
                     .map(row -> Try.ofSupplier(() -> TransactionDTO.of(excelRange, row))
-                            .onFailure((e) -> failedRows.put(row.getRowNum(), e.getMessage())))
+                            .onFailure(e -> failedRows.put(row.getRowNum(), e.getMessage())))
                     //only process successfully parsed rows
                     .filter(Try::isSuccess)
                     .map(Try::get)
                     //Save to db
                     .forEach(opportunity -> Try.run(() -> opportunityService.save(opportunity))
-                            .onFailure((e) -> failedRows.put(opportunity.getRowNum(), e.getMessage())));
+                            .onFailure(e -> failedRows.put(opportunity.getRowNum(), e.getMessage())));
 
-            log.error("Failed rows: {}", failedRows.entrySet().stream().map((entry) -> String.format("Row %s: %s", entry.getKey(), entry.getValue())).collect(Collectors.joining("\n")));
-            long totalRows = excelRange.getEnd().getRow() - excelRange.getStart().getRow();
+            log.error("Failed rows: {}", failedRows.entrySet().stream().map(entry -> String.format("Row %s: %s", entry.getKey(), entry.getValue())).collect(Collectors.joining("\n")));
+            int totalRows = excelRange.getEnd().getRow() - excelRange.getStart().getRow();
 
             return totalRows - failedRows.size() + 1;            //+ 1 because it's zero based
         } catch (MissingSheetException missingSheetException) {

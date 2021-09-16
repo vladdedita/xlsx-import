@@ -8,10 +8,9 @@ public class ExcelRangeValidator implements ConstraintValidator<ValidExcelRange,
 
     @Override
     public void initialize(ValidExcelRange constraintAnnotation) {
-
+        //intentionally left empty
     }
 
-    //TODO - should add order validation - Ex: A2:A1 should be invalid
     @Override
     public boolean isValid(String range, ConstraintValidatorContext constraintValidatorContext) {
         Pattern pattern = Pattern.compile("\\b[A-Z]+\\d+:[A-Z]+\\d+\\b");

@@ -10,6 +10,9 @@ import java.util.function.Predicate;
 @Getter
 public class BoundedExcelRange extends ExcelRange {
 
+    private static final CellAddress LEFTMOST_LIMIT = new CellAddress("B3");
+    private static final CellAddress RIGHTMOST_LIMIT = new CellAddress("K3");
+
     public BoundedExcelRange(String range, CellAddress startBound, CellAddress endBound) {
         super(range);
         if (this.start.getRow() < startBound.getRow())
@@ -19,9 +22,6 @@ public class BoundedExcelRange extends ExcelRange {
         if (this.end.getColumn() > endBound.getColumn())
             throw new IllegalArgumentException("Last data column in excel should be at least: " + startBound.formatAsString());
     }
-
-    private static final CellAddress LEFTMOST_LIMIT = new CellAddress("B3");
-    private static final CellAddress RIGHTMOST_LIMIT = new CellAddress("K3");
 
     public BoundedExcelRange(String range) {
         super(range);
