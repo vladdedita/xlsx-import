@@ -15,7 +15,7 @@ Add parameters to filter by team, product, bookingtype and date range (startDate
 
 ** Instructions
 
-Run ```docker-compose up -d``` to fire up PostgreSQL docker
-Run ```mvn clean install```
-Run ```mvn spring-boot:run```
+Run ```docker-compose up -d``` to fire up PostgreSQL docker \
+Run ```mvn clean install``` \
+Run ```mvn spring-boot:run``` 
 
