@@ -1,0 +1,101 @@
+{
+	"info": {
+		"_postman_id": "e02d61e1-df92-4b49-abfe-c64f77d245cf",
+		"name": "Stratify Assignment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Upload XLSX",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.ms-excel",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/ded/Desktop/test.xlsx"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/upload?range=B3:F50&worksheet=MOCK_DATA_47",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"upload"
+					],
+					"query": [
+						{
+							"key": "range",
+							"value": "B3:F50"
+						},
+						{
+							"key": "worksheet",
+							"value": "MOCK_DATA_47"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Opportunities",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/opportunity?team=EAST&startDate=01-01-2017&endDate=01-01-2019&product=ALLOY",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"opportunity"
+					],
+					"query": [
+						{
+							"key": "team",
+							"value": "EAST"
+						},
+						{
+							"key": "bookingType",
+							"value": "RENEWAL",
+							"disabled": true
+						},
+						{
+							"key": "startDate",
+							"value": "01-01-2017"
+						},
+						{
+							"key": "endDate",
+							"value": "01-01-2019"
+						},
+						{
+							"key": "product",
+							"value": "ALLOY"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
