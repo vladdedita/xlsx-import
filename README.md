@@ -12,3 +12,10 @@ Data from XLSX file to be added into the corresponding table in DB, excluding du
 GET /opportunity 
 returns all objects if no filter is applied
 Add parameters to filter by team, product, bookingtype and date range (startDate, endDate based on bookingdate field 
+
+** Instructions
+
+Run ```docker-compose up -d``` to fire up PostgreSQL docker
+Run ```mvn clean install```
+Run ```mvn spring-boot:run```
+
